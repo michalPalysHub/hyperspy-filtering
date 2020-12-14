@@ -4,7 +4,7 @@ The application was created for the purpose of my engineer's thesis. The idea of
 
 ## Installation and running
 
-In order to make the application runnable, please follow below steps:
+In order to make the application runnable, please follow the below steps:
 
 1. Download the latest release of Hyperspy-bundle from https://github.com/hyperspy/hyperspy-bundle/releases
 2. Run the installer that will install the distribution in the current directory.
