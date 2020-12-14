@@ -9,8 +9,8 @@ In order to make the application runnable, please follow the below steps:
 1. Download the latest release of Hyperspy-bundle from https://github.com/hyperspy/hyperspy-bundle/releases
 2. Run the installer that will install the distribution in the current directory.
 3. Open the newly created folder, open WinPython Command Prompt and run the commands below:
-  1. `pip install seaborn`
-  2. `pip install django`
-  3. `pip install mpld3`
+   1. `pip install seaborn`
+   2. `pip install django`
+   3. `pip install mpld3`
 4. Move .bcf files you want to analyse to the "data" folder.
 5. In WinPython Command Prompt, move to the application's directory (precisely the directory with Manage.py file) and run `python manage.py runserver` command.
