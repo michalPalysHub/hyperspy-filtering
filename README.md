@@ -1,6 +1,6 @@
 # hyperspy-filtering
 
-The application was created in connection with my engineer's thesis. The idea of the program was to make an easy and convinient tool for materials engineers that would help them analyse materials' microstructure images in an automated matter. The logic of the application is fully based on Piotr Macioł, PhD. Eng. code.
+The application was created in connection with my engineer's thesis. The idea of the program was to make an easy and convinient tool for materials engineers that would help them analyse materials' microstructure images in an automated matter. The logic of the application is fully based on the code of Piotr Macioł, PhD. Eng.
 
 ## Installation
 
