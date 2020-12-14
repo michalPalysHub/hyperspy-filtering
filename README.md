@@ -12,4 +12,5 @@ In order to make the application runnable, please follow below steps:
   1. `pip install seaborn`
   2. `pip install django`
   3. `pip install mpld3`
-4. Move to the application's directory (precisely the directory with Manage.py file) and run `python manage.py runserver` command
+4. Move .bcf files you want to analyse to the "data" folder.
+5. In WinPython Command Prompt, move to the application's directory (precisely the directory with Manage.py file) and run `python manage.py runserver` command.
