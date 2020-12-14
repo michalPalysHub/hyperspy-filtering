@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Wykresy -->
+<div id="haadf">
+  <h4 class="card-subtitle">Obraz HAADF</h4>
+  <div class="card-body">
+    <img src="{{haadf}}" width="625" height="500" class="rounded mx-auto d-block">
+  </div>
+</div>
+<div id="eds">
+  <h4 class="card-subtitle">Obraz EDS</h4>
+  <div class="card-body text-center">
+    <img src="{{eds_summed}}" width="800" height="500" class="rounded mx-auto d-block">
+  </div>
+</div>
+<hr>
+<div id="eds-interactive">
+  <h4 class="card-subtitle">Obraz EDS interaktywny</h4>
+  <div id={{eds_summed_interactive}} class="card-body text-center">
+    {{eds_summed_interactive|safe}}
+  </div>
+</div>
+<hr>
+
+<!-- Identyfikacja pików -->
+<div id="peaks-identification" class="card">
+  <div class="card-body">
+    <h2 class="card-title text-center">Identyfikacja pików</h2>
+    <div class="card-text">
+
+      <!-- Podawanie zakresu na osi X -->
+      <label>Podaj zakres na osi X, dla którego chcesz zidentyfikować piki</label>
+      <form class="form-inline" action="{% url 'peaks_identification' %}" method="post" autocomplete="off">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="isig-l">od</label>
+          <input id="isig-l" name="isig-l" type="text" class="form-control mx-sm-3" placeholder="{{isig_l_default}}">
+        </div>
+        <div class="form-group">
+          <label for="isig-r">do</label>
+          <input id="isig-r" name="isig-r" type="text" class="form-control mx-sm-3" placeholder="{{isig_r_default}}">
+        </div>
+        <button type="submit" class="btn btn-secondary">Identyfikuj piki</button>
+      </form>
+
+      <!-- Wyświetlanie komunikatów o błędach -->
+      {% if error_message %}
+      <br>
+      <div class="alert alert-danger" role="alert">
+        {{ error_message }}
+      </div>
+      {% endif %}
+
+      <!-- Zestawienie wykrytych pików -->
+      {% if peaks_data %}
+      <br>
+      <p>Dla zakresu: {{isig_l}} - {{isig_r}}</p>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">l.p.</th>
+            <th scope="col">Lewa granica</th>
+            <th scope="col">Prawa granica</th>
+            <th scope="col">Lewa granica (keV)</th>
+            <th scope="col">Prawa granica (keV)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for data in peaks_data %}
+          <tr>
+            <th scope="row">{{forloop.counter}}</th>
+            <td>{{ data.0.0 }}</td>
+            <td>{{ data.0.1 }}</td>
+            <td>{{ data.1.0 }}</td>
+            <td>{{ data.1.1 }}</td>
+            <td>
+              <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deletePeakModal"
+                data-id="{{forloop.counter0}}">
+                Usuń
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <button type="button" class="btn btn-info" data-toggle="modal" data-target="#addPeakModal">
+        Dodaj pik
+      </button>
+
+      <!-- Modale dla dodawania oraz usuwania pików -->
+
+      <!-- Dodawanie pików-->
+      <div class="modal fade" id="addPeakModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+        aria-labelledby="addPeakModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addPeakModalLabel">Dodaj pik</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form action="{% url 'add_peak' %}" method="post" autocomplete="off">
+              {% csrf_token %}
+              <div class="modal-body">
+                <div class="form-group row">
+                  <label for="isig-l" class="text-right col-sm-2 col-form-label">od</label>
+                  <div class="col-sm-8">
+                    <input id="isig-l" name="isig-l" type="text" class="form-control mx-sm-3" placeholder="Lewy zakres"
+                      required>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="isig-r" class="text-right col-sm-2 col-form-label">do</label>
+                  <div class="col-sm-8">
+                    <input id="isig-r" name="isig-r" type="text" class="form-control mx-sm-3" placeholder="Prawy zakres"
+                      required>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+                <button type="submit" class="btn btn-danger">Dodaj</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Usuwanie pików -->
+      <form action="{% url 'delete_peak' %}" method="post">
+        {% csrf_token %}
+        <div class="modal fade" id="deletePeakModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+          aria-labelledby="deletePeakModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="deletePeakModalLabel">Usuń pik</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                Czy na pewno chcesz usunąć ten pik?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+                <input type="hidden" id="deletePeakId" name="peakId">
+                <button type="submit" class="btn btn-danger">Usuń</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+  <script>
+    $(document).ready(function () {
+      $('#deletePeakModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget)
+        var recipient = button.data('id')
+        var modal = $(this)
+        modal.find('.modal-footer input').val(recipient)
+      })
+    });
+  </script>
+</div>
+
+{% if peaks_data %}
+<hr>
+<div class="card" id="next-section">
+  <div class="card-body">
+    <h2 class="card-title text-center">Separacja kanałów</h2>
+    <p class="card-text text-center">
+      Jeżeli dokonałeś identyfikacji pików, przejdź do dalszego kroku
+    </p>
+    <a href="{% url 'channels_separation' %}" class="btn btn-secondary btn-lg">Przejdź dalej</a>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block navbar %}
+<li class="nav-item">
+  <a class="nav-link active" href="{% url 'peaks_identification' %}">Identyfikacja peaków</a>
+</li>
+<li class="nav-item">
+  {% if navbar_properties.1 is True %}
+  <a class="nav-link" href="{% url 'channels_separation' %}">Separacja kanałów</a>
+  {% else %}
+  <a class="nav-link disabled" href="">Separacja kanałów</a>
+  {% endif %}
+</li>
+<li class="nav-item">
+  {% if navbar_properties.2 is True %}
+  <a class="nav-link" href="{% url 'summary' %}">Podsumowanie</a>
+  {% else %}
+  <a class="nav-link disabled" href="">Podsumowanie</a>
+  {% endif %}
+</li>
+{% endblock %}

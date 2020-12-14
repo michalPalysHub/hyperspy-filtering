@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Podawanie wartości parametrów -->
+<div id="parameters">
+    <h5 class="card-title">Proszę podać wartości dla poniższych parametrów</h5>
+    <br>
+    <form action="" method="post" autocomplete="off">
+        {% csrf_token %}
+        <div class="form-group row">
+            <label class="col-sm-5 col-form-label" for="areaThreshold">Próg powierzchni obrazu:</label>
+            <input id="areaThreshold" name="areaThreshold" type="text" class="form-control col-sm-3"
+                placeholder="{{default_parameters.0}}">
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-5 col-form-label" for="dilationRange">Zakres rozszerzania jasnych obszarów:</label>
+            <input id="dilationRange" name="dilationRange" type="text" class="form-control col-sm-3"
+                placeholder="{{default_parameters.1}}">
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-5 col-form-label" for="closingRange">Zakres dla domykania jasnych obszarów:</label>
+            <input id="closingRange" name="closingRange" type="text" class="form-control col-sm-3"
+                placeholder="{{default_parameters.2}}">
+        </div>
+        <button type="submit" class="btn btn-secondary">Pokaż wyniki</button>
+    </form>
+</div>
+
+
+<!-- Wyświetlanie wartości wykorzystanych parametrów-->
+{% if parameters %}
+<hr><br>
+<h5>Zastosowane wartości:</h5>
+<br>
+<p>Próg powierzchni obrazu: {{ parameters.0 }}</p>
+<p>Zakres rozszerzania jasnych obszarów: {{ parameters.1 }}</p>
+<p>Zakres dla domykania jasnych obszarów: {{ parameters.2 }}</p>
+<br>
+{% endif %}
+
+
+<!-- Wyświetlanie wykresów -->
+{% if labeled_data_plot %}
+<div id="labeledDataPlot">
+    <hr>
+    <h5>
+        Obraz uzyskany poprzez wykrywanie oraz oznaczanie ziaren na obrazie mikroskopowym:
+    </h5>
+    <div class="card-body">
+        <img src="{{labeled_data_plot}}" width="625" height="500" class="rounded mx-auto d-block">
+    </div>
+</div>
+{% endif %}
+{% if summed_data_plot %}
+<div id="summedDataPlot">
+    <hr>
+    <h5>
+        Oryginalny obraz materiału:
+    </h5>
+    <div class="card-body">
+        <img src="{{summed_data_plot}}" width="625" height="500" class="rounded mx-auto d-block">
+    </div>
+</div>
+{% endif %}
+{% if summed_data_boundaries_plot %}
+<div id="summedDataBoundariesPlot">
+    <hr>
+    <h5>
+        Obraz materiału wraz z naniesionymi na niego wykrytymi granicami ziaren:
+    </h5>
+    <div class="card-body">
+        <img src="{{summed_data_boundaries_plot}}" width="500s" height="500" class="rounded mx-auto d-block">
+    </div>
+</div>
+<a href="{% url 'load_file' %}" class="btn btn-secondary">Załaduj nowe dane</a>
+{% endif %}
+
+
+<!-- Wyświetlanie komunikatów o błędach -->
+{% if error_message %}
+<br>
+<div class="alert alert-danger" role="alert">
+    {{ error_message }}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block navbar %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'peaks_identification' %}">Identyfikacja peaków</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'channels_separation' %}">Separacja kanałów</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{% url 'summary' %}">Podsumowanie</a>
+</li>
+{% endblock %}

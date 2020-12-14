@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Podawanie wartości współczynnika filtrowania Gauss'a -->
+<div id="gaussFilterCoeff">
+    <h5 class="card-title">Proszę podać wartość współczynnika dla filtrowania Gauss'a</h5>
+    <br>
+    <form class="form-inline" action="{% url 'channels_separation' %}" method="post" autocomplete="off">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="gaussFiltCoeff">Wartość:</label>
+            <input id="gaussFiltCoeff" name="gaussFiltCoeff" type="text" class="form-control mx-sm-3"
+                placeholder="{{gauss_filter_coeff_default}}">
+        </div>
+        <button type="submit" class="btn btn-secondary">Filtruj</button>
+    </form>
+    <br>
+</div>
+
+
+<!-- Wyświetlanie danych dla każdego z pików -->
+{% if peaks_data_with_plots %}
+<div id="dataPeaksPlots">
+    <hr>
+    <p>Zastosowana wartość współczynnika Gaussa: {{ gauss_filter_coeff }}</p>
+    <p>Przykładowe wartości wag: [0., -0.5, 2.0, 0., 0., 0., -0.5, 0., 0.]</p>
+    <br>
+
+    <form class="form" action="{% url 'sum_channels' %}" method="post" autocomplete="off">
+        {% csrf_token %}
+        {% for data in peaks_data_with_plots %}
+        <div class="card">
+            <img src="{{data.0}}" width="625" height="500" class="rounded mx-auto d-block">
+            <div class="card-body" id="dataPeakPlot{{forloop.counter0}}">
+                <p class="card-text">Peak nr {{forloop.counter}}: {{data.1.0}}keV - {{data.1.1}}keV</p>
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label for="peak{{forloop.counter0}}" class="col-form-label">Waga:</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="text" name="peak{{forloop.counter0}}_weight" id="peak{{forloop.counter0}}"
+                            class="form-control" placeholder="{{data.2}}">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        {% endfor %}
+        <button type="submit" class="btn btn-secondary">Uzyskaj zsumowany obraz</button>
+    </form>
+</div>
+{% endif %}
+
+
+<!-- Wyświetlanie dla ważonej sumy danych wszystkich pików -->
+{% if weighted_sum_data_peaks_plot %}
+<div id="summedDataPeakPlot">
+    <br>
+    <hr>
+    <p>
+        Obraz uzyskany poprzez zastosowanie sumy ważonej sygnałów dla poszczególnych pików energii:
+    </p>
+    <div class="card-body">
+        <img src="{{weighted_sum_data_peaks_plot}}" width="625" height="500" class="rounded mx-auto d-block">
+    </div>
+</div>
+<hr>
+<div class="card" id="next-section">
+    <div class="card-body">
+        <h2 class="card-title text-center">Podsumowanie</h2>
+        <p class="card-text text-center">
+            Jeżeli przyporządkowałeś wagi do każdego z obrazów odpowiadających poszczególnym pikom energii i uzyskałeś
+            interesujący Cię zsumowany obraz, przejdź do podsumowania
+        </p>
+        <a href="{% url 'summary' %}" class="btn btn-secondary btn-lg">Przejdź dalej</a>
+    </div>
+</div>
+{% endif %}
+
+<!-- Wyświetlanie komunikatów o błędach -->
+{% if error_message %}
+<br>
+<div class="alert alert-danger" role="alert">
+    {{ error_message }}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block navbar %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'peaks_identification' %}">Identyfikacja peaków</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{% url 'channels_separation' %}">Separacja kanałów</a>
+</li>
+<li class="nav-item">
+    {% if navbar_properties.2 is True %}
+    <a class="nav-link" href="{% url 'summary' %}">Podsumowanie</a>
+    {% else %}
+    <a class="nav-link disabled" href="">Podsumowanie</a>
+    {% endif %}
+</li>
+{% endblock %}

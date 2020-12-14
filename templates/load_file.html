@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="card-title">Hyperspy filtering demo</h2>
+<p class="card-text"> Umieść wybrany do analizy plik .bcf w folderze 'data'.</p>
+<p>Wykryte pliki:</p>
+
+{% if bcf_files %}
+<form action="{% url 'file_loaded' %}" method="post">
+    {% csrf_token %}
+    {% for filename in bcf_files %}
+    <div class="form-check">
+        <input type="radio" class="form-check-input" name="filename" id="filename{{ forloop.counter }}"
+            value="{{ filename }}">
+        <label class="form-check-label" for="filename{{ forloop.counter }}">
+            {{ filename }}
+        </label>
+    </div>
+    {% endfor %}
+    <br>
+    <button type="submit" class="btn btn-secondary">Załaduj dane</button>
+</form>
+{% else %}
+<p>Brak plików</p>
+{% endif %}
+
+{% if error_message %}
+<br>
+<p><strong>{{ error_message }}</strong></p>
+{% endif %}
+
+{% endblock %}
+
+{% block navbar %}
+<li class="nav-item">
+    {% if navbar_properties.0 is True %}
+    <a class="nav-link" href="{% url 'peaks_identification' %}">Identyfikacja peaków</a>
+    {% else %}
+    <a class="nav-link disabled" href="">Identyfikacja peaków</a>
+    {% endif %}
+</li>
+<li class="nav-item">
+    {% if navbar_properties.1 is True %}
+    <a class="nav-link" href="{% url 'channels_separation' %}">Separacja kanałów</a>
+    {% else %}
+    <a class="nav-link disabled" href="">Separacja kanałów</a>
+    {% endif %}
+</li>
+<li class="nav-item">
+    {% if navbar_properties.2 is True %}
+    <a class="nav-link" href="{% url 'summary' %}">Podsumowanie</a>
+    {% else %}
+    <a class="nav-link disabled" href="">Podsumowanie</a>
+    {% endif %}
+</li>
+{% endblock %}
